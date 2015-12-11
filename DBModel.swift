@@ -143,6 +143,12 @@ class DBModel: NSManagedObject {
         return []
     }
 
+    var currentContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
+    
+    func inContext(moc: NSManagedObjectContext) {
+        currentContext = moc
+    }
+
     func dateFromLongString(date: String) -> NSDate {
         let dateFormatter: NSDateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -156,10 +162,20 @@ class DBModel: NSManagedObject {
     }
 
     func delete() {
-        appDelegate.managedObjectContext.deleteObject(self as NSManagedObject)
+        currentContext.deleteObject(self as NSManagedObject)
     }
 
     func save() {
-        appDelegate.saveContext()
+        if currentContext.hasChanges {
+            do {
+                try currentContext.save()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nserror = error as NSError
+                NSLog("Unresolved error \(nserror), \(nserror.userInfo)")
+                abort()
+            }
+        }
     }
 }
