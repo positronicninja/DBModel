@@ -24,7 +24,7 @@ class DBModel: NSManagedObject {
 
     // Find and Create Queries
     // DBModel.find(Where.init(["remoteID":[142]))
-    class func find(predicate: Where) -> AnyObject {
+    class func find(predicate: Where, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
         // Create a new fetch request using the subclass entity
         let fetchRequest = NSFetchRequest(entityName: getClassName())
         fetchRequest.predicate = predicate.search()
@@ -32,7 +32,7 @@ class DBModel: NSManagedObject {
         // Execute the fetch request, and cast the results to an array of name objects
         do {
             let fetchResults =
-            try managedObjectContext.executeFetchRequest(fetchRequest) as NSArray
+            try moc.executeFetchRequest(fetchRequest) as NSArray
             if fetchResults != [] {
                 return fetchResults[0] }
         } catch PropertyError.NoEntityFound {
@@ -43,7 +43,7 @@ class DBModel: NSManagedObject {
         return []
     }
 
-    class func findByKey(key: String, withValue value: AnyObject) -> AnyObject {
+    class func findByKey(key: String, withValue value: AnyObject, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
         // Create a new fetch request using the subclass entity
         let fetchRequest = NSFetchRequest(entityName: getClassName())
         fetchRequest.predicate = Where.init(terms: [key:[value]]).search()
@@ -51,7 +51,7 @@ class DBModel: NSManagedObject {
         // Execute the fetch request, and cast the results to an array of name objects
         do {
             let fetchResults =
-            try managedObjectContext.executeFetchRequest(fetchRequest) as NSArray
+            try moc.executeFetchRequest(fetchRequest) as NSArray
             if fetchResults != [] {
                 return fetchResults[0] }
         } catch PropertyError.NoEntityFound {
@@ -62,7 +62,7 @@ class DBModel: NSManagedObject {
         return []
     }
     
-    class func findByPredicate(predicate: Where) -> AnyObject {
+    class func findByPredicate(predicate: Where, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
         // Create a new fetch request using the subclass entity
         let fetchRequest = NSFetchRequest(entityName: getClassName())
         fetchRequest.predicate = predicate.search()
@@ -70,7 +70,7 @@ class DBModel: NSManagedObject {
         // Execute the fetch request, and cast the results to an array of name objects
         do {
             let fetchResults =
-            try managedObjectContext.executeFetchRequest(fetchRequest) as NSArray
+            try moc.executeFetchRequest(fetchRequest) as NSArray
             if fetchResults != [] {
                 return fetchResults[0] }
         } catch PropertyError.NoEntityFound {
@@ -81,27 +81,27 @@ class DBModel: NSManagedObject {
         return []
     }
     
-    class func findOrCreateByPredicate(predicate: Where, byKey key: String, withValue value: AnyObject) -> AnyObject {
-        let entity = findByPredicate(predicate)
+    class func findOrCreateByPredicate(predicate: Where, byKey key: String, withValue value: AnyObject, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
+        let entity = findByPredicate(predicate, inContext: moc)
         
         if entity as! NSObject == [] {
-            return createByKey(key, withValue: value)
+            return createByKey(key, withValue: value, inContext: moc)
         }
         return entity
     }
 
-    class func findOrCreateByKey(key: String, withValue value: AnyObject) -> AnyObject {
-        let entity = findByKey(key, withValue: value)
+    class func findOrCreateByKey(key: String, withValue value: AnyObject, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
+        let entity = findByKey(key, withValue: value, inContext: moc)
         
         if entity as! NSObject == [] {
-            return createByKey(key, withValue: value)
+            return createByKey(key, withValue: value, inContext: moc)
         }
         return entity
     }
 
-    class func createByKey(key: String, withValue value: AnyObject) -> AnyObject {
+    class func createByKey(key: String, withValue value: AnyObject, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
         // Create a new object entity using the subclass entity
-        let entity = NSEntityDescription.insertNewObjectForEntityForName(getClassName(), inManagedObjectContext: managedObjectContext)
+        let entity = NSEntityDescription.insertNewObjectForEntityForName(getClassName(), inManagedObjectContext: moc)
         entity.setValue(value, forKey: key)
         return entity
     }
@@ -111,20 +111,20 @@ class DBModel: NSManagedObject {
     }
 
     // Execute Query
-    class func all() -> AnyObject {
-        return query(Where.init(), withOrder: defaultSortOrder())
+    class func all(moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
+        return query(Where.init(), withOrder: defaultSortOrder(), inContext: moc)
     }
     
-    class func allWithSort(order: SortOrder) -> AnyObject {
-        return query(Where.init(), withOrder: order)
+    class func allWithSort(order: SortOrder, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
+        return query(Where.init(), withOrder: order, inContext: moc)
     }
     
-    class func query(predicate: Where) -> AnyObject {
+    class func query(predicate: Where, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
         // Create a new fetch request using the subclass entity
-        return query(predicate, withOrder: defaultSortOrder())
+        return query(predicate, withOrder: defaultSortOrder(), inContext: moc)
     }
     
-    class func query(predicate: Where, withOrder order: SortOrder) -> AnyObject {
+    class func query(predicate: Where, withOrder order: SortOrder, inContext moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
         // Create a new fetch request using the subclass entity
         let fetchRequest = NSFetchRequest(entityName: getClassName())
         fetchRequest.sortDescriptors = order.sort()
@@ -133,7 +133,7 @@ class DBModel: NSManagedObject {
         // Execute the fetch request, and cast the results to an array of name objects
         do {
             let fetchResults =
-            try managedObjectContext.executeFetchRequest(fetchRequest)
+            try moc.executeFetchRequest(fetchRequest)
             return fetchResults
         } catch PropertyError.NoEntityFound {
             print("No Properties Found.")
