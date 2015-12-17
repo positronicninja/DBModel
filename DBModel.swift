@@ -162,7 +162,8 @@ class DBModel: NSManagedObject {
     }
 
     func delete() {
-        currentContext.deleteObject(self as NSManagedObject)
+        (UIApplication.sharedApplication().delegate as! AppDelegate)
+            .managedObjectContext.deleteObject(self as NSManagedObject)
     }
 
     func save() {
