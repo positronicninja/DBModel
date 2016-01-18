@@ -111,6 +111,10 @@ class DBModel: NSManagedObject {
     }
 
     // Execute Query
+    class func none(moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
+        return []
+    }
+
     class func all(moc: NSManagedObjectContext = managedObjectContext) -> AnyObject {
         return query(Where.init(), withOrder: defaultSortOrder(), inContext: moc)
     }
