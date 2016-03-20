@@ -1,6 +1,5 @@
 //
 //  DBModel.swift
-//  EstateTV
 //
 //  Created by Development on 2015-10-14.
 //  Copyright © 2015 Gryphon & Rook Inc. All rights reserved.
